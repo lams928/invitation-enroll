@@ -77,6 +77,37 @@ class SIREC_Users_List_Table extends WP_List_Table {
         );
     }
 
+    public function get_users_table_rows($search = '', $role = '') {
+        $args = [
+            'number' => 20,
+            'search' => $search ? '*' . $search . '*' : '',
+            'search_columns' => ['user_login', 'user_email', 'display_name'],
+            'role' => $role
+        ];
+        
+        $users_query = new WP_User_Query($args);
+        $users = $users_query->get_results();
+        
+        ob_start();
+        if ($users) {
+            foreach ($users as $user) {
+                echo '<tr>';
+                echo '<td class="check-column">';
+                echo '<input type="checkbox" name="selected_users[]" value="' . esc_attr($user->ID) . '">';
+                echo '</td>';
+                echo '<td>' . esc_html($user->user_login) . '</td>';
+                echo '<td>' . esc_html($user->display_name) . '</td>';
+                echo '<td>' . esc_html($user->user_email) . '</td>';
+                echo '<td>' . esc_html($this->column_role($user)) . '</td>';
+                echo '<td>' . esc_html($this->column_registered($user)) . '</td>';
+                echo '</tr>';
+            }
+        } else {
+            echo '<tr><td colspan="6">No se encontraron usuarios.</td></tr>';
+        }
+        return ob_get_clean();
+    }
+
     protected function column_username($item) {
         return esc_html($item->user_login);
     }

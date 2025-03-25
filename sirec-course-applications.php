@@ -14,6 +14,29 @@ define('SIREC_PLUGIN_URL', plugin_dir_url(__FILE__));
 register_activation_hook(__FILE__, 'sirec_activate_plugin');
 add_action('init', 'sirec_register_custom_endpoint');
 
+add_action('wp_ajax_sirec_search_users', 'sirec_handle_user_search');
+
+function sirec_handle_user_search() {
+    check_ajax_referer('sirec_nonce', 'nonce');
+    
+    if (!current_user_can('edit_users')) {
+        wp_send_json_error('No tienes permisos para realizar esta acción.');
+    }
+    
+    $search = isset($_POST['search']) ? sanitize_text_field($_POST['search']) : '';
+    $role = isset($_POST['role']) ? sanitize_text_field($_POST['role']) : '';
+    
+    require_once SIREC_PLUGIN_DIR . 'includes/class-users-list-table.php';
+    $users_table = new SIREC_Users_List_Table();
+    
+    $html = $users_table->get_users_table_rows($search, $role);
+    
+    wp_send_json_success([
+        'html' => $html
+    ]);
+}
+
+
 function sirec_activate_plugin() {
     global $wpdb;
     

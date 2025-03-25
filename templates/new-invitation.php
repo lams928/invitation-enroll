@@ -76,14 +76,14 @@
                             ?>
                             <div class="tablenav top">
                                 <div class="alignleft actions">
-                                    <form method="get">
-                                        <input type="hidden" name="page" value="<?php echo esc_attr($_REQUEST['page']) ?>" />
-                                        <?php $users_table->search_box('Buscar Usuarios', 'search_id'); ?>
-                                    </form>
+                                    <input type="search" id="user-search-input" name="s" 
+                                        value="<?php echo isset($_REQUEST['s']) ? esc_attr($_REQUEST['s']) : ''; ?>"
+                                        placeholder="Buscar usuarios...">
+                                    <span class="user-search-spinner spinner"></span>
                                 </div>
                                 <br class="clear">
                             </div>
-                            
+
                             <?php
                             // Mostrar los filtros de rol
                             echo '<div class="wrap">';
@@ -123,6 +123,47 @@
 
 <script>
 jQuery(document).ready(function($) {
+    //aajx
+    let searchTimer;
+    const $searchInput = $('#user-search-input');
+    const $spinner = $('.user-search-spinner');
+    const $usersList = $('.wp-list-table tbody');
+
+    function performSearch() {
+        const searchTerm = $searchInput.val();
+        $spinner.addClass('is-active');
+
+        $.ajax({
+            url: ajaxurl,
+            type: 'POST',
+            data: {
+                action: 'sirec_search_users',
+                nonce: sirecAjax.nonce,
+                search: searchTerm,
+                role: $('select[name="role"]').val()
+            },
+            success: function(response) {
+                if (response.success) {
+                    $usersList.html(response.data.html);
+                } else {
+                    console.error('Error en la búsqueda:', response.data);
+                }
+            },
+            error: function(xhr, status, error) {
+                console.error('Error AJAX:', error);
+            },
+            complete: function() {
+                $spinner.removeClass('is-active');
+            }
+        });
+    }
+
+    $searchInput.on('input', function() {
+        clearTimeout(searchTimer);
+        searchTimer = setTimeout(performSearch, 500);
+    });
+
+    
     $('#select-all-users').on('change', function() {
         $('input[name="selected_users[]"]').prop('checked', $(this).prop('checked'));
     });

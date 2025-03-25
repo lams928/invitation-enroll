@@ -62,3 +62,13 @@
     display: block;
     visibility: visible;
 }
+
+.user-search-spinner {
+    float: none;
+    margin: 0 0 0 5px;
+}
+
+#user-search-input {
+    padding: 6px 8px;
+    min-width: 200px;
+}
