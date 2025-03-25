@@ -63,40 +63,42 @@
                     <th><label for="selected_users">Seleccionar Usuarios</label></th>
                     <td>
                         <?php
-                        $users_table = new WP_List_Table();
-                        $users = get_users([
-                            'orderby' => 'display_name',
-                            'order' => 'ASC'
-                        ]);
+                        if (!class_exists('SIREC_Users_List_Table')) {
+                            require_once SIREC_PLUGIN_DIR . 'includes/class-users-list-table.php';
+                        }
+                        
+                        try {
+                            // Crear instancia de la tabla
+                            $users_table = new SIREC_Users_List_Table();
+                            $users_table->prepare_items();
+                            
+                            // Formulario de búsqueda
+                            ?>
+                            <div class="tablenav top">
+                                <div class="alignleft actions">
+                                    <form method="get">
+                                        <input type="hidden" name="page" value="<?php echo esc_attr($_REQUEST['page']) ?>" />
+                                        <?php $users_table->search_box('Buscar Usuarios', 'search_id'); ?>
+                                    </form>
+                                </div>
+                                <br class="clear">
+                            </div>
+                            
+                            <?php
+                            // Mostrar los filtros de rol
+                            echo '<div class="wrap">';
+                            echo '<div class="tablenav top">';
+                            $users_table->views();
+                            echo '</div>';
+                            
+                            // Mostrar la tabla
+                            $users_table->display();
+                            echo '</div>';
+                            
+                        } catch (Exception $e) {
+                            echo '<div class="notice notice-error"><p>Error al cargar la tabla de usuarios: ' . esc_html($e->getMessage()) . '</p></div>';
+                        }
                         ?>
-                        <div class="wp-list-table-container" style="max-height: 400px; overflow-y: auto;">
-                            <table class="wp-list-table widefat fixed striped">
-                                <thead>
-                                    <tr>
-                                        <th scope="col" class="manage-column column-cb check-column">
-                                            <input type="checkbox" id="select-all-users">
-                                        </th>
-                                        <th>Nombre</th>
-                                        <th>Email</th>
-                                        <th>Rol</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <?php foreach($users as $user): ?>
-                                        <tr>
-                                            <th scope="row" class="check-column">
-                                                <input type="checkbox" 
-                                                    name="selected_users[]" 
-                                                    value="<?php echo esc_attr($user->ID); ?>">
-                                            </th>
-                                            <td><?php echo esc_html($user->display_name); ?></td>
-                                            <td><?php echo esc_html($user->user_email); ?></td>
-                                            <td><?php echo esc_html(implode(', ', $user->roles)); ?></td>
-                                        </tr>
-                                    <?php endforeach; ?>
-                                </tbody>
-                            </table>
-                        </div>
                     </td>
                 </tr>
 

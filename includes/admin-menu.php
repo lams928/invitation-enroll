@@ -2,6 +2,7 @@
 if (!defined('ABSPATH')) exit;
 
 add_action('admin_menu', 'sirec_add_admin_menu');
+require_once SIREC_PLUGIN_DIR . 'includes/class-users-list-table.php';
 
 function sirec_add_admin_menu() {
     add_menu_page(

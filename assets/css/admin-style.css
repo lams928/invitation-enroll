@@ -1,0 +1,64 @@
+
+.wp-list-table-container {
+    margin-top: 10px;
+}
+
+.tablenav {
+    clear: both;
+    height: auto;
+    margin: 6px 0 4px;
+    vertical-align: middle;
+}
+
+.tablenav.top {
+    margin-top: 0;
+}
+
+.tablenav .actions {
+    padding: 2px 8px 0 0;
+}
+
+.tablenav .tablenav-pages {
+    float: right;
+    margin: 0 0 9px;
+}
+
+.wp-list-table {
+    border-spacing: 0;
+    width: 100%;
+    clear: both;
+}
+
+.wp-list-table thead th,
+.wp-list-table tfoot th {
+    font-weight: 600;
+}
+
+.wp-list-table td,
+.wp-list-table th {
+    padding: 8px 10px;
+}
+
+.wp-list-table .check-column {
+    width: 2.2em;
+    padding: 8px 0 0 3px;
+}
+
+.wp-list-table .column-cb {
+    width: 2.2em;
+}
+
+.wp-list-table .sorting-indicator {
+    display: none;
+    visibility: hidden;
+}
+
+.wp-list-table .sorting-indicator:before {
+    content: "\f142";
+    font: normal 20px/1 dashicons;
+}
+
+.wp-list-table .sorted .sorting-indicator {
+    display: block;
+    visibility: visible;
+}
