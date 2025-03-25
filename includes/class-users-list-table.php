@@ -22,21 +22,22 @@ class SIREC_Users_List_Table extends WP_List_Table {
         $sortable = $this->get_sortable_columns();
         
         $this->_column_headers = [$columns, $hidden, $sortable];
+
         
-        $search = isset($_REQUEST['s']) ? wp_unslash(trim($_REQUEST['s'])) : '';
+        
+        $search = isset($_REQUEST['s']) ? sanitize_text_field($_REQUEST['s']) : '';
         $role = isset($_REQUEST['role']) ? $_REQUEST['role'] : '';
         
         $args = [
             'number' => $per_page,
             'offset' => ($this->get_pagenum() - 1) * $per_page,
-            'search' => $search ? '*' . $search . '*' : '',
-            'search_columns' => ['user_login', 'user_email', 'display_name'],
             'orderby' => isset($_REQUEST['orderby']) ? $_REQUEST['orderby'] : 'display_name',
             'order' => isset($_REQUEST['order']) ? $_REQUEST['order'] : 'ASC'
         ];
         
-        if (!empty($role)) {
-            $args['role'] = $role;
+        if (!empty($search)) {
+            $args['search'] = '*' . $search . '*';
+            $args['search_columns'] = ['user_login', 'user_email', 'display_name'];
         }
         
         $users_query = new WP_User_Query($args);

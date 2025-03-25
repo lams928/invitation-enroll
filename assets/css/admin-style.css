@@ -31,3 +31,11 @@
     margin: 0;
     padding: 0;
 }
+.users-table-container.loading {
+    opacity: 0.5;
+    pointer-events: none;
+}
+
+.users-table-container {
+    transition: opacity 0.3s ease;
+}

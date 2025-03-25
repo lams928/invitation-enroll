@@ -74,10 +74,10 @@
                             <div class="users-table-container">
                                 <div class="tablenav top">
                                     <div class="alignleft actions">
-                                        <form method="get">
+                                        <div id="users-search-form"> 
                                             <input type="hidden" name="page" value="<?php echo esc_attr($_REQUEST['page']) ?>" />
                                             <?php $users_table->search_box('Buscar Usuarios', 'search_id'); ?>
-                                        </form>
+                                        </div>
                                     </div>
                                     <br class="clear">
                                 </div>
@@ -102,13 +102,13 @@
                     </td>
                 </tr>
 
-                <tr>
+                <!-- <tr>
                     <th><label for="invitation_message">Mensaje Personalizado</label></th>
                     <td>
                         <textarea name="invitation_message" id="invitation_message" rows="5" cols="50"
                             placeholder="Mensaje opcional que se incluirá en la invitación..."></textarea>
                     </td>
-                </tr>
+                </tr> -->
             </table>
             
             <div class="submit-button">
@@ -179,6 +179,35 @@ jQuery(document).ready(function($) {
             complete: function() {
                 $spinner.removeClass('is-active');
                 $submit.prop('disabled', false);
+            }
+        });
+    });
+
+    $('#search-submit').on('click', function(e) {
+        e.preventDefault();
+        
+        const searchTerm = $('#search_id-search-input').val();
+        const $tableContainer = $('.users-table-container');
+        
+        $.ajax({
+            url: ajaxurl,
+            type: 'POST',
+            data: {
+                action: 'sirec_search_users',
+                nonce: $('#invitation_nonce').val(),
+                search: searchTerm,
+                page: $('input[name="page"]').val()
+            },
+            beforeSend: function() {
+                $tableContainer.addClass('loading');
+            },
+            success: function(response) {
+                if(response.success) {
+                    $('.wp-list-table').replaceWith(response.data);
+                }
+            },
+            complete: function() {
+                $tableContainer.removeClass('loading');
             }
         });
     });
