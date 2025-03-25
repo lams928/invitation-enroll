@@ -60,55 +60,56 @@
                     <th colspan="2"><h3>Invitaciones Individuales</h3></th>
                 </tr>
                 <tr>
-                    <th><label for="selected_users">Seleccionar Usuarios</label></th>
-                    <td>
-                        <?php
-                        if (!class_exists('SIREC_Users_List_Table')) {
-                            require_once SIREC_PLUGIN_DIR . 'includes/class-users-list-table.php';
-                        }
-                        
-                        try {
-                            // Crear instancia de la tabla
-                            $users_table = new SIREC_Users_List_Table();
-                            $users_table->prepare_items();
-                            
-                            // Formulario de búsqueda
-                            ?>
-                            <div class="tablenav top">
-                                <div class="alignleft actions">
-                                    <input type="search" id="user-search-input" name="s" 
-                                        value="<?php echo isset($_REQUEST['s']) ? esc_attr($_REQUEST['s']) : ''; ?>"
-                                        placeholder="Buscar usuarios...">
-                                    <span class="user-search-spinner spinner"></span>
-                                </div>
-                                <br class="clear">
-                            </div>
-
+                    <td colspan="2" style="padding: 0;">
+                        <div style="width: 100%;">
+                            <label style="display: block; margin-bottom: 10px;"><strong>Seleccionar Usuarios</strong></label>
                             <?php
-                            // Mostrar los filtros de rol
-                            echo '<div class="wrap">';
-                            echo '<div class="tablenav top">';
-                            $users_table->views();
-                            echo '</div>';
+                            if (!class_exists('SIREC_Users_List_Table')) {
+                                require_once SIREC_PLUGIN_DIR . 'includes/class-users-list-table.php';
+                            }
                             
-                            // Mostrar la tabla
-                            $users_table->display();
-                            echo '</div>';
-                            
-                        } catch (Exception $e) {
-                            echo '<div class="notice notice-error"><p>Error al cargar la tabla de usuarios: ' . esc_html($e->getMessage()) . '</p></div>';
-                        }
-                        ?>
+                            try {
+                                $users_table = new SIREC_Users_List_Table();
+                                $users_table->prepare_items();
+                                
+                                // Formulario de búsqueda
+                                ?>
+                                <div class="tablenav top">
+                                    <div class="alignleft actions">
+                                        <input type="search" id="user-search-input" name="s" 
+                                            value="<?php echo isset($_REQUEST['s']) ? esc_attr($_REQUEST['s']) : ''; ?>"
+                                            placeholder="Buscar usuarios...">
+                                        <span class="user-search-spinner spinner"></span>
+                                    </div>
+                                    <br class="clear">
+                                </div>
+
+                                <?php
+                                // Mostrar los filtros de rol
+                                echo '<div class="wrap" style="margin: 0; padding: 0; width: 100%;">';
+                                echo '<div class="tablenav top">';
+                                $users_table->views();
+                                echo '</div>';
+                                
+                                // Mostrar la tabla
+                                $users_table->display();
+                                echo '</div>';
+                                
+                            } catch (Exception $e) {
+                                echo '<div class="notice notice-error"><p>Error al cargar la tabla de usuarios: ' . esc_html($e->getMessage()) . '</p></div>';
+                            }
+                            ?>
+                        </div>
                     </td>
                 </tr>
 
-                <tr>
+                <!-- <tr>
                     <th><label for="invitation_message">Mensaje Personalizado</label></th>
                     <td>
                         <textarea name="invitation_message" id="invitation_message" rows="5" cols="50"
                             placeholder="Mensaje opcional que se incluirá en la invitación..."></textarea>
                     </td>
-                </tr>
+                </tr> -->
             </table>
             
             <div class="submit-button">
@@ -163,6 +164,12 @@ jQuery(document).ready(function($) {
         searchTimer = setTimeout(performSearch, 500);
     });
 
+    $searchInput.on('keypress', function(e) {
+        if (e.which === 13) {
+            e.preventDefault();
+            performSearch();
+        }
+    });
     
     $('#select-all-users').on('change', function() {
         $('input[name="selected_users[]"]').prop('checked', $(this).prop('checked'));
@@ -224,4 +231,7 @@ jQuery(document).ready(function($) {
         });
     });
 });
+
+
+
 </script>
