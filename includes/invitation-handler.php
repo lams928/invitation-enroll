@@ -15,19 +15,27 @@ function sirec_handle_send_invitations() {
     $course_id = intval($_POST['course_id']);
     $custom_message = sanitize_textarea_field($_POST['message']);
     $selected_roles = isset($_POST['selected_roles']) ? (array)$_POST['selected_roles'] : [];
+    $selected_users = isset($_POST['selected_users']) ? array_map('intval', (array)$_POST['selected_users']) : [];
     
-    if(empty($selected_roles)) {
-        wp_send_json_error('Debes seleccionar al menos un rol.');
+    if(empty($selected_roles) && empty($selected_users)) {
+        wp_send_json_error('Debes seleccionar al menos un rol o usuario.');
     }
     
-    // Obtener usuarios de los roles seleccionados
     $users = [];
     foreach($selected_roles as $role) {
         $role_users = get_users(['role' => $role]);
         $users = array_merge($users, $role_users);
     }
     
-    // Eliminar duplicados si un usuario tiene múltiples roles
+    if(!empty($selected_users)) {
+        foreach($selected_users as $user_id) {
+            $user = get_user_by('id', $user_id);
+            if($user) {
+                $users[] = $user;
+            }
+        }
+    }
+    
     $users = array_unique($users, SORT_REGULAR);
     
     $notification_sent_count = 0;
@@ -51,45 +59,38 @@ function sirec_handle_send_invitations() {
         }
     }
     
-    $notification_message = sprintf(
-        'Notificaciones: %d enviadas exitosamente de %d intentos. %s',
-        $notification_sent_count,
-        count($users),
-        !empty($notification_errors) ? 'Errores: ' . implode(', ', $notification_errors) : ''
-    );
-    
-    $email_message = sprintf(
-        'Correos electrónicos: %d enviados exitosamente de %d intentos. %s',
-        $email_sent_count,
-        count($users),
-        !empty($email_errors) ? 'Errores: ' . implode(', ', $email_errors) : ''
-    );
-    
     $response = [
         'success' => ($notification_sent_count > 0 || $email_sent_count > 0),
         'notification_stats' => [
             'sent_count' => $notification_sent_count,
             'total_attempts' => count($users),
             'errors' => $notification_errors,
-            'message' => $notification_message
+            'message' => sprintf(
+                'Notificaciones: %d enviadas exitosamente de %d intentos. %s',
+                $notification_sent_count,
+                count($users),
+                !empty($notification_errors) ? 'Errores: ' . implode(', ', $notification_errors) : ''
+            )
         ],
         'email_stats' => [
             'sent_count' => $email_sent_count,
             'total_attempts' => count($users),
             'errors' => $email_errors,
-            'message' => $email_message
+            'message' => sprintf(
+                'Correos electrónicos: %d enviados exitosamente de %d intentos. %s',
+                $email_sent_count,
+                count($users),
+                !empty($email_errors) ? 'Errores: ' . implode(', ', $email_errors) : ''
+            )
         ]
     ];
     
     wp_send_json_success($response);
 }
 
-// In invitation-handler.php
 function sirec_send_invitation_email($user, $course_id, $custom_message) {
-    // Generate unique token
     $token = wp_generate_password(32, false);
     
-    // Store token in database
     global $wpdb;
     $wpdb->insert(
         $wpdb->prefix . 'sirec_invitation_tokens',
@@ -106,7 +107,6 @@ function sirec_send_invitation_email($user, $course_id, $custom_message) {
     $course = get_post($course_id);
     $subject = sprintf('Invitación al curso: %s', $course->post_title);
     
-    // Modified message with unique form link
     $form_url = home_url('/invitacion-curso/?token=' . $token);
     
     $message = sprintf(
