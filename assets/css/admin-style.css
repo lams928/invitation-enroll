@@ -1,6 +1,6 @@
-
 .wp-list-table-container {
     margin-top: 10px;
+    overflow-x: auto; 
 }
 
 .tablenav {
@@ -18,15 +18,16 @@
     padding: 2px 8px 0 0;
 }
 
-.tablenav .tablenav-pages {
+/* .tablenav .tablenav-pages {
     float: right;
     margin: 0 0 9px;
-}
+} */
 
 .wp-list-table {
     border-spacing: 0;
     width: 100%;
     clear: both;
+    table-layout: fixed; 
 }
 
 .wp-list-table thead th,
@@ -37,15 +38,20 @@
 .wp-list-table td,
 .wp-list-table th {
     padding: 8px 10px;
+    vertical-align: middle;
 }
 
-.wp-list-table .check-column {
-    width: 2.2em;
-    padding: 8px 0 0 3px;
-}
-
+.wp-list-table .check-column,
 .wp-list-table .column-cb {
     width: 2.2em;
+    padding: 8px 0;
+    text-align: center;
+}
+
+.wp-list-table .check-column input[type="checkbox"],
+.wp-list-table .column-cb input[type="checkbox"] {
+    margin: 0 auto; 
+    display: block;
 }
 
 .wp-list-table .sorting-indicator {
@@ -72,3 +78,14 @@
     padding: 6px 8px;
     min-width: 200px;
 }
+
+.wp-list-table tbody tr {
+    height: 40px; 
+}
+
+/* .tablenav-pages a, 
+.tablenav-pages span {
+    display: inline-block;
+    padding: 5px 10px;
+    line-height: 1;
+} */
