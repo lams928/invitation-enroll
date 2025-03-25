@@ -1,11 +1,32 @@
 jQuery(document).ready(function($) {
+    function loadUserData() {
+        $.ajax({
+            url: sirecAjax.ajaxurl,
+            type: 'POST',
+            data: {
+                action: 'sirec_get_user_data',
+                nonce: sirecAjax.nonce
+            },
+            success: function(response) {
+                if (response.success) {
+                    $('#first_name').val(response.data.first_name);
+                    $('#last_name').val(response.data.last_name);
+                }
+            },
+            error: function() {
+                console.log('Error al cargar datos del usuario');
+            }
+        });
+    }
+
+    loadUserData();
+
     $('.sirec-form').on('submit', function(e) {
         e.preventDefault();
         
         var form = $(this);
         var submitButton = form.find('button[type="submit"]');
         
-        // Disable submit button
         submitButton.prop('disabled', true);
         
         $.ajax({
@@ -25,12 +46,10 @@ jQuery(document).ready(function($) {
             },
             success: function(response) {
                 if (response.success) {
-                    // Show success modal
                     $('#successModal').show();
                     
-                    // Handle return home button with hardcoded URL
                     $('#returnHomeBtn').off('click').on('click', function() {
-                        window.location.href = '/'; // This will redirect to the home page
+                        window.location.href = '/';
                     });
                 } else {
                     alert(response.data);

@@ -8,6 +8,25 @@ function sirec_unauthorized_submission() {
     wp_send_json_error('Debes iniciar sesión para enviar una solicitud.');
 }
 
+add_action('wp_ajax_sirec_get_user_data', 'sirec_get_user_data');
+
+function sirec_get_user_data() {
+    check_ajax_referer('sirec_application_nonce', 'nonce');
+    
+    if (!is_user_logged_in()) {
+        wp_send_json_error('Usuario no autorizado');
+    }
+
+    $current_user = wp_get_current_user();
+    
+    $user_data = array(
+        'first_name' => get_user_meta($current_user->ID, 'first_name', true),
+        'last_name' => get_user_meta($current_user->ID, 'last_name', true)
+    );
+    
+    wp_send_json_success($user_data);
+}
+
 function notify_editors_of_new_application($application_id, $course_id) {
     // Obtener todos los usuarios con el rol 'edit_iiiccab'
     $editors = get_users(['role' => 'edit_iiiccab']);
@@ -26,7 +45,6 @@ function notify_editors_of_new_application($application_id, $course_id) {
             ));
         }
         
-        // Enviar correo electrónico
         $subject = sprintf(__('Nueva solicitud de curso pendiente: %s', 'sirec'), get_the_title($course_id));
         $admin_url = admin_url('admin.php?page=sirec-applications');
         
@@ -88,7 +106,6 @@ function sirec_handle_application_submission() {
     );
     
     if ($result) {
-        // Marcar token como usado
         $wpdb->update(
             $wpdb->prefix . 'sirec_invitation_tokens',
             array('used' => 1),
@@ -124,12 +141,10 @@ function sirec_handle_approve_application() {
     }
 
     try {
-        // Iniciar proceso de matrícula
         $enrollment_handler = new SIREC_Enrollment_Handler();
         $enrollment_result = $enrollment_handler->process_enrollment($application);
         
         if ($enrollment_result['moodle']) {
-            // Actualizar estado de la solicitud
             $update_result = $wpdb->update(
                 $wpdb->prefix . 'course_applications',
                 array(
@@ -154,7 +169,6 @@ function sirec_handle_approve_application() {
                 wp_send_json_error('Error al actualizar el estado de la solicitud en la base de datos.');
             }
             
-            // Enviar notificación
             SIREC_Notifications::send_application_notification($application_id, 'approved');
             
             wp_send_json_success('Solicitud aprobada y usuario matriculado correctamente.');
