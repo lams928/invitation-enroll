@@ -1,0 +1,33 @@
+.users-table-container {
+    width: 100%;
+    margin: 0;
+    padding: 0;
+}
+
+.users-table-container .wp-list-table {
+    width: 100%;
+    margin: 0;
+    border-spacing: 0;
+}
+
+.form-table td {
+    padding: 15px;
+}
+
+.form-table td[colspan="2"] {
+    padding: 0;
+}
+
+.users-table-container .wp-list-table th,
+.users-table-container .wp-list-table td {
+    padding: 8px;
+}
+
+.users-table-container .tablenav {
+    padding: 8px;
+}
+
+.users-table-container .wrap {
+    margin: 0;
+    padding: 0;
+}
